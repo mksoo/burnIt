@@ -1,8 +1,8 @@
 import { FC } from "react"
 import { Text, View } from "react-native"
-import { RootStackScreenProps } from "./navigation";
+import { MainTabScreenProps, RootStackScreenProps } from "./navigation";
 
-const HomeScreen: FC<RootStackScreenProps<'Home'>>= () => {
+const HomeScreen: FC<MainTabScreenProps<'Home'>>= () => {
     return (
         <View style={{
             backgroundColor: 'red',
