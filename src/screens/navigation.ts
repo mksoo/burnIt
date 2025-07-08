@@ -11,6 +11,9 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
+  Calendar: undefined;
+  Library: undefined;
+  MyPage: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

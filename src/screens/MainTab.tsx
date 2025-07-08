@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import { MainTabParamList } from './navigation';
 import HomeScreen from './HomeScreen';
+import CalendarScreen from './CalendarScreen';
+import LibraryScreen from './LibraryScreen';
+import MyPageScreeen from './MyPageScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -42,6 +45,42 @@ const TabBar: FC<BottomTabBarProps> = ({ state, navigation }) => {
             </TouchableOpacity>
           );
         }
+
+        if (name === 'Calendar') {
+          return (
+            <TouchableOpacity
+              style={[styles.tabBarItem]}
+              key={`calendar-${isFocused}`}
+              onPress={handlePressNavigate(name)}
+            >
+              <Text>Calendar</Text>
+            </TouchableOpacity>
+          );
+        }
+
+        if (name === 'Library') {
+          return (
+            <TouchableOpacity
+              style={[styles.tabBarItem]}
+              key={`library-${isFocused}`}
+              onPress={handlePressNavigate(name)}
+            >
+              <Text>Library</Text>
+            </TouchableOpacity>
+          );
+        }
+
+        if (name === 'MyPage') {
+          return (
+            <TouchableOpacity
+              style={[styles.tabBarItem]}
+              key={`mypage-${isFocused}`}
+              onPress={handlePressNavigate(name)}
+            >
+              <Text>MyPage</Text>
+            </TouchableOpacity>
+          );
+        }
       })}
     </View>
   );
@@ -57,6 +96,9 @@ const MainTab: FC = () => {
       tabBar={props => <TabBar {...props} />}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} />
+      <Tab.Screen name="Library" component={LibraryScreen} />
+      <Tab.Screen name="MyPage" component={MyPageScreeen} />
     </Tab.Navigator>
   );
 };
