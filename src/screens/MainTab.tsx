@@ -15,6 +15,8 @@ import HomeScreen from './HomeScreen';
 import CalendarScreen from './CalendarScreen';
 import LibraryScreen from './LibraryScreen';
 import MyPageScreeen from './MyPageScreen';
+import SvgIcon from '../components/common/SvgIcon';
+import { colors } from '@/styles/colors';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -41,7 +43,21 @@ const TabBar: FC<BottomTabBarProps> = ({ state, navigation }) => {
               key={`home-${isFocused}`}
               onPress={handlePressNavigate(name)}
             >
-              <Text>Home</Text>
+              <SvgIcon
+                name="home"
+                color={
+                  isFocused ? colors.grayscale[100] : colors.grayscale[500]
+                }
+              />
+              <Text
+                style={{
+                  color: isFocused
+                    ? colors.grayscale[100]
+                    : colors.grayscale[500],
+                }}
+              >
+                Home
+              </Text>
             </TouchableOpacity>
           );
         }
@@ -53,7 +69,21 @@ const TabBar: FC<BottomTabBarProps> = ({ state, navigation }) => {
               key={`calendar-${isFocused}`}
               onPress={handlePressNavigate(name)}
             >
-              <Text>Calendar</Text>
+              <SvgIcon
+                name="calendar"
+                color={
+                  isFocused ? colors.grayscale[100] : colors.grayscale[900]
+                }
+              />
+              <Text
+                style={{
+                  color: isFocused
+                    ? colors.grayscale[100]
+                    : colors.grayscale[500],
+                }}
+              >
+                Calendar
+              </Text>
             </TouchableOpacity>
           );
         }
@@ -65,7 +95,21 @@ const TabBar: FC<BottomTabBarProps> = ({ state, navigation }) => {
               key={`library-${isFocused}`}
               onPress={handlePressNavigate(name)}
             >
-              <Text>Library</Text>
+              <SvgIcon
+                name="library"
+                color={
+                  isFocused ? colors.grayscale[100] : colors.grayscale[500]
+                }
+              />
+              <Text
+                style={{
+                  color: isFocused
+                    ? colors.grayscale[100]
+                    : colors.grayscale[500],
+                }}
+              >
+                Library
+              </Text>
             </TouchableOpacity>
           );
         }
@@ -77,7 +121,21 @@ const TabBar: FC<BottomTabBarProps> = ({ state, navigation }) => {
               key={`mypage-${isFocused}`}
               onPress={handlePressNavigate(name)}
             >
-              <Text>MyPage</Text>
+              <SvgIcon
+                name="profile"
+                color={
+                  isFocused ? colors.grayscale[900] : colors.grayscale[100]
+                }
+              />
+              <Text
+                style={{
+                  color: isFocused
+                    ? colors.grayscale[100]
+                    : colors.grayscale[500],
+                }}
+              >
+                MyPage
+              </Text>
             </TouchableOpacity>
           );
         }
