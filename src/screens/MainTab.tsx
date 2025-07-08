@@ -72,7 +72,7 @@ const TabBar: FC<BottomTabBarProps> = ({ state, navigation }) => {
               <SvgIcon
                 name="calendar"
                 color={
-                  isFocused ? colors.grayscale[100] : colors.grayscale[900]
+                  isFocused ? colors.grayscale[100] : colors.grayscale[500]
                 }
               />
               <Text
@@ -124,7 +124,7 @@ const TabBar: FC<BottomTabBarProps> = ({ state, navigation }) => {
               <SvgIcon
                 name="profile"
                 color={
-                  isFocused ? colors.grayscale[900] : colors.grayscale[100]
+                  isFocused ? colors.grayscale[100] : colors.grayscale[900]
                 }
               />
               <Text
