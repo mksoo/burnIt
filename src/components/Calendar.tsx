@@ -126,34 +126,71 @@ const Calendar: FC = () => {
     return textStyle;
   };
 
-  const renderCalendar = () => {
+  const CalendarDate = (args: { colIndex: number; item: dayItem }) => {
+    const { colIndex, item } = args;
+    const textStyle = getTextStyle({ colIndex, item }); // 날짜 스타일 결정
+    return (
+      <TouchableOpacity
+        style={styles.cell}
+        key={colIndex}
+        onPress={() =>
+          handleDayPress({
+            day: item.day ?? 0,
+            isInCurrentMonth: item.isInCurrentMonth,
+          })
+        }
+      >
+        <Text style={textStyle}>{item.day}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const CalendarWeek = (args: { rowIndex: number; row: dayItem[] }) => {
+    const { rowIndex, row } = args;
+    const rowItems = row.map((item, colIndex) => (
+      <CalendarDate item={item} colIndex={colIndex} />
+    ));
+    return (
+      <View style={styles.row} key={rowIndex}>
+        {rowItems}
+      </View>
+    );
+  };
+
+  const CalendarBody = () => {
     // 여기다가 요일 header 추가하면 될 듯.
     const matrix = generateMatrix();
-    let rows = matrix.map((row, rowIndex) => {
-      let rowItems = row.map((item, colIndex) => {
-        const textStyle = getTextStyle({ colIndex, item }); // 날짜 스타일 결정
-        return (
-          <TouchableOpacity
-            style={styles.cell}
-            key={colIndex}
-            onPress={() =>
-              handleDayPress({
-                day: item.day,
-                isInCurrentMonth: item.isInCurrentMonth,
-              })
-            }
-          >
-            <Text style={textStyle}>{item.day}</Text>
-          </TouchableOpacity>
-        );
-      });
-      return (
-        <View style={styles.row} key={rowIndex}>
-          {rowItems}
-        </View>
-      );
-    });
+    const rows = matrix.map((row, rowIndex) => (
+      <CalendarWeek rowIndex={rowIndex} row={row} />
+    ));
     return <View style={styles.calendar}>{rows}</View>;
+  };
+
+  const CalendarHeader = () => {
+    return (
+      <View style={styles.row}>
+        {days.map((value, index) => {
+          const renderTextStyle = (args: { index: number }) => {
+            const { index } = args;
+
+            let textStyle =
+              index === 0
+                ? styles.cellTextRed
+                : index === 6
+                ? styles.cellTextBlue
+                : styles.cellText;
+            return textStyle;
+          };
+
+          const textStyle = renderTextStyle({ index }); // 날짜 스타일 결정
+          return (
+            <View style={styles.cell}>
+              <Text style={textStyle}>{value}</Text>
+            </View>
+          );
+        })}
+      </View>
+    );
   };
 
   const handleDayPress = (args: { day: number; isInCurrentMonth: boolean }) => {
@@ -203,7 +240,10 @@ const Calendar: FC = () => {
             <Text style={styles.monthLabel}>Next &gt;</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.calendar}>{renderCalendar()}</View>
+        <View style={styles.calendar}>
+          <CalendarHeader />
+          <CalendarBody />
+        </View>
       </View>
     </SafeAreaView>
   );
