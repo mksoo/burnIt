@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -27,7 +27,7 @@ const months = [
 ];
 
 type dayItem = {
-  day: number | undefined;
+  day: number;
   isInCurrentMonth: boolean;
 };
 
@@ -165,23 +165,22 @@ const Calendar: FC = () => {
     );
   };
 
-  const handleDayPress = (args: { day: number; isInCurrentMonth: boolean }) => {
-    const { day, isInCurrentMonth } = args;
-    const year = currentMonth.year();
-    const month = currentMonth.month();
+  const handleDayPress = useCallback(
+    (args: { day: number; isInCurrentMonth: boolean }) => {
+      const { day, isInCurrentMonth } = args;
 
-    if (!isInCurrentMonth) {
-      // 클릭한 날짜가 현재 월이 아니면 월로 바꾼다.
-      const isNextMonth = day < 15;
-      const newMonth = isNextMonth ? month + 1 : month - 1;
-      const newYear = newMonth < 0 ? year - 1 : newMonth > 11 ? year + 1 : year;
+      if (!isInCurrentMonth) {
+        // 클릭한 날짜가 현재 월이 아니면 월로 바꾼다.
+        const isNextMonth = day < 15;
+        const addMonthValue = isNextMonth ? 1 : -1;
+        setCurrentMonth(prev => prev.add(addMonthValue, 'month'));
+      }
+      // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
+      setSelectedDay(day);
+    },
+    [],
+  );
 
-      const newCurrentMonth = dayjs(`${newYear}-${newMonth}-01`);
-      setCurrentMonth(newCurrentMonth);
-    }
-    // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
-    setSelectedDay(day);
-  };
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -258,13 +257,14 @@ const styles = StyleSheet.create({
     color: '#0000004D',
   },
   selectedDay: {
-    backgroundColor: '#E6EEF5',
-    textAlign: 'center',
-    lineHeight: 40,
-    color: '#000',
-    height: 40,
-    width: 40,
+    borderColor: 'red',
+    borderWidth: 1,
     borderRadius: 20,
+    textAlign: 'center',
+    lineHeight: CELL_SIZE,
+    color: '#000',
+    height: CELL_SIZE,
+    width: CELL_SIZE,
     overflow: 'hidden',
   },
   cellTextGrayOpacity: {
