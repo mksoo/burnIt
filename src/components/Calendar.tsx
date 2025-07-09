@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { FC, useCallback, useState } from 'react';
 import {
+  FlatList,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -29,6 +30,7 @@ const months = [
 type dayItem = {
   day: number;
   isInCurrentMonth: boolean;
+  colIndex: number; // Add colIndex to determine the day of the week for styling
 };
 
 const CELL_SIZE = 40;
@@ -45,9 +47,9 @@ const Calendar: FC = () => {
     setCurrentMonth(currentMonth.add(-1, 'month'));
   };
 
-  const generateMatrix = () => {
-    const matrix: dayItem[][] = [];
-
+  // Generates a flat list of day items for the FlatList
+  const generateDays = () => {
+    const daysArray: dayItem[] = [];
     const firstDay = currentMonth.startOf('month').day();
     const maxDate = currentMonth.endOf('month').date();
     const maxDateOfPreviousMonth = currentMonth
@@ -55,28 +57,27 @@ const Calendar: FC = () => {
       .endOf('month')
       .date();
 
-    let index = -firstDay + 1; // 첫 주의 첫 날짜를 계산
-    for (let row = 0; row < 6; row++) {
-      matrix[row] = [];
-      for (let col = 0; col < 7; col++) {
-        const isInCurrentMonth = index > 0 && index <= maxDate;
-        let cellValue: number;
+    // 6 rows * 7 columns = 42 cells
+    for (let i = 0; i < 42; i++) {
+      const colIndex = i % 7;
+      const index = i - firstDay;
+      const isInCurrentMonth = index >= 0 && index < maxDate;
+      let cellValue: number;
 
-        if (isInCurrentMonth) {
-          cellValue = index;
-        } else if (index <= 0) {
-          cellValue = maxDateOfPreviousMonth + index;
-        } else {
-          cellValue = index - maxDate;
-        }
-        matrix[row][col] = {
-          day: cellValue,
-          isInCurrentMonth,
-        };
-        index++;
+      if (isInCurrentMonth) {
+        cellValue = index + 1;
+      } else if (index < 0) {
+        cellValue = maxDateOfPreviousMonth + index + 1;
+      } else {
+        cellValue = index - maxDate + 1;
       }
+      daysArray.push({
+        day: cellValue,
+        isInCurrentMonth,
+        colIndex: colIndex,
+      });
     }
-    return matrix;
+    return daysArray;
   };
 
   const getTextStyle = (args: { colIndex: number; item: dayItem }) => {
@@ -101,16 +102,28 @@ const Calendar: FC = () => {
     return textStyle;
   };
 
-  const CalendarDate = (args: { colIndex: number; item: dayItem }) => {
-    const { colIndex, item } = args;
-    const textStyle = getTextStyle({ colIndex, item }); // 날짜 스타일 결정
+  const handleDayPress = useCallback(
+    (args: { day: number; isInCurrentMonth: boolean }) => {
+      const { day, isInCurrentMonth } = args;
+
+      if (!isInCurrentMonth) {
+        const isNextMonth = day < 15;
+        const addMonthValue = isNextMonth ? 1 : -1;
+        setCurrentMonth(prev => prev.add(addMonthValue, 'month'));
+      }
+      setSelectedDay(day);
+    },
+    [],
+  );
+
+  const renderCalendarCell = ({ item, index }: { item: dayItem; index: number }) => {
+    const textStyle = getTextStyle({ colIndex: item.colIndex, item });
     return (
       <TouchableOpacity
         style={styles.cell}
-        key={`date-${colIndex}`}
         onPress={() =>
           handleDayPress({
-            day: item.day ?? 0,
+            day: item.day,
             isInCurrentMonth: item.isInCurrentMonth,
           })
         }
@@ -120,43 +133,30 @@ const Calendar: FC = () => {
     );
   };
 
-  const CalendarWeek = (args: { rowIndex: number; row: dayItem[] }) => {
-    const { rowIndex, row } = args;
-    const rowItems = row.map((item, colIndex) => (
-      <CalendarDate item={item} colIndex={colIndex} />
-    ));
-    return (
-      <View key={`week-${rowIndex}`} style={styles.row}>
-        {rowItems}
-      </View>
-    );
-  };
-
   const CalendarBody = () => {
-    const matrix = generateMatrix();
-    const rows = matrix.map((row, rowIndex) => (
-      <CalendarWeek rowIndex={rowIndex} row={row} />
-    ));
-    return <View style={styles.calendar}>{rows}</View>;
+    const days = generateDays();
+    return (
+      <FlatList
+        data={days}
+        renderItem={renderCalendarCell}
+        keyExtractor={(item, index) => `day-${index}`}
+        numColumns={7}
+        style={styles.calendar}
+        scrollEnabled={false} // To disable scroll for the calendar grid
+      />
+    );
   };
 
   const CalendarHeader = () => {
     return (
       <View style={styles.row}>
         {days.map((value, index) => {
-          const renderTextStyle = (args: { index: number }) => {
-            const { index } = args;
-
-            let textStyle =
-              index === 0
-                ? styles.cellTextRed
-                : index === 6
-                ? styles.cellTextBlue
-                : styles.cellText;
-            return textStyle;
-          };
-
-          const textStyle = renderTextStyle({ index }); // 날짜 스타일 결정
+          const textStyle =
+            index === 0
+              ? styles.cellTextRed
+              : index === 6
+              ? styles.cellTextBlue
+              : styles.cellText;
           return (
             <View key={`${value}-${index}`} style={styles.cell}>
               <Text style={textStyle}>{value}</Text>
@@ -166,23 +166,6 @@ const Calendar: FC = () => {
       </View>
     );
   };
-
-  const handleDayPress = useCallback(
-    (args: { day: number; isInCurrentMonth: boolean }) => {
-      const { day, isInCurrentMonth } = args;
-
-      if (!isInCurrentMonth) {
-        // 클릭한 날짜가 현재 월이 아니면 월로 바꾼다.
-        const isNextMonth = day < 15;
-        const addMonthValue = isNextMonth ? 1 : -1;
-        setCurrentMonth(prev => prev.add(addMonthValue, 'month'));
-      }
-      // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
-      setSelectedDay(day);
-    },
-    [],
-  );
-
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -199,7 +182,7 @@ const Calendar: FC = () => {
             <Text style={styles.monthLabel}>Next &gt;</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.calendar}>
+        <View style={styles.calendarContainer}>
           <CalendarHeader />
           <CalendarBody />
         </View>
@@ -221,8 +204,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
   },
-  calendar: {
+  calendarContainer: { // Renamed from calendar
     justifyContent: 'space-between',
+  },
+  calendar: {
+    // Styles for FlatList if any
   },
   monthLabel: {
     fontSize: 18,
