@@ -1,3 +1,4 @@
+import { colors } from '@/styles/colors';
 import dayjs from 'dayjs';
 import { FC, useCallback, useState } from 'react';
 import {
@@ -30,7 +31,7 @@ const months = [
 type dayItem = {
   day: number;
   isInCurrentMonth: boolean;
-  colIndex: number; // Add colIndex to determine the day of the week for styling
+  colIndex: number;
 };
 
 const CELL_SIZE = 40;
@@ -39,15 +40,16 @@ const Calendar: FC = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDay, setSelectedDay] = useState<number>(-1);
 
-  const goToNextMonth = () => {
+  const handleClickNextMonth = () => {
+    setSelectedDay(-1);
     setCurrentMonth(currentMonth.add(1, 'month'));
   };
 
-  const goToPreviousMonth = () => {
+  const handleClickPreviousMonth = () => {
+    setSelectedDay(-1);
     setCurrentMonth(currentMonth.add(-1, 'month'));
   };
 
-  // Generates a flat list of day items for the FlatList
   const generateDays = () => {
     const daysArray: dayItem[] = [];
     const firstDay = currentMonth.startOf('month').day();
@@ -57,7 +59,6 @@ const Calendar: FC = () => {
       .endOf('month')
       .date();
 
-    // 6 rows * 7 columns = 42 cells
     for (let i = 0; i < 42; i++) {
       const colIndex = i % 7;
       const index = i - firstDay;
@@ -116,7 +117,7 @@ const Calendar: FC = () => {
     [],
   );
 
-  const renderCalendarCell = ({ item, index }: { item: dayItem; index: number }) => {
+  const renderCalendarCell = ({ item }: { item: dayItem }) => {
     const textStyle = getTextStyle({ colIndex: item.colIndex, item });
     return (
       <TouchableOpacity
@@ -139,10 +140,9 @@ const Calendar: FC = () => {
       <FlatList
         data={days}
         renderItem={renderCalendarCell}
-        keyExtractor={(item, index) => `day-${index}`}
+        keyExtractor={(_, index) => `day-${index}`}
         numColumns={7}
-        style={styles.calendar}
-        scrollEnabled={false} // To disable scroll for the calendar grid
+        scrollEnabled={false}
       />
     );
   };
@@ -171,14 +171,14 @@ const Calendar: FC = () => {
     <SafeAreaView style={styles.bg}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={goToPreviousMonth}>
+          <TouchableOpacity onPress={handleClickPreviousMonth}>
             <Text style={styles.monthLabel}>&lt; Prev</Text>
           </TouchableOpacity>
           <Text style={styles.monthLabel}>
             {currentMonth.year()}.&nbsp;
             {months[currentMonth.month()]}
           </Text>
-          <TouchableOpacity onPress={goToNextMonth}>
+          <TouchableOpacity onPress={handleClickNextMonth}>
             <Text style={styles.monthLabel}>Next &gt;</Text>
           </TouchableOpacity>
         </View>
@@ -204,15 +204,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
   },
-  calendarContainer: { // Renamed from calendar
+  calendarContainer: {
     justifyContent: 'space-between',
-  },
-  calendar: {
-    // Styles for FlatList if any
   },
   monthLabel: {
     fontSize: 18,
-    color: '#000',
+    color: colors.grayscale[100],
   },
   row: {
     flexDirection: 'row',
@@ -224,25 +221,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerText: {
-    color: '#000',
+    color: colors.grayscale[100],
   },
   headerTextRed: {
-    color: '#FF0000',
+    color: colors.calendar.holiday,
   },
   headerTextBlue: {
-    color: '#007BA4',
+    color: colors.calendar.saterday,
   },
   cellText: {
-    color: '#000',
+    color: colors.calendar.normal,
   },
   cellTextRed: {
-    color: '#FF0000',
+    color: colors.calendar.holiday,
   },
   cellTextBlue: {
-    color: '#007BA4',
+    color: colors.calendar.saterday,
   },
   cellTextGray: {
-    color: '#0000004D',
+    color: colors.grayscale[500],
   },
   selectedDay: {
     borderColor: 'red',
@@ -250,16 +247,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     textAlign: 'center',
     lineHeight: CELL_SIZE,
-    color: '#000',
+    color: colors.grayscale[100],
     height: CELL_SIZE,
     width: CELL_SIZE,
     overflow: 'hidden',
   },
   cellTextGrayOpacity: {
     opacity: 0.3,
-  },
-  specificDate: {
-    color: '#FF0000',
   },
 });
 
