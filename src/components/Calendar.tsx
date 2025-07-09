@@ -31,6 +31,8 @@ type dayItem = {
   isInCurrentMonth: boolean;
 };
 
+const CELL_SIZE = 40;
+
 const Calendar: FC = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDay, setSelectedDay] = useState<number>(-1);
@@ -231,7 +233,7 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    height: 40,
+    height: CELL_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
   },
