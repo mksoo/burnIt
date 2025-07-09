@@ -1,6 +1,6 @@
 import { colors } from '@/styles/colors';
 import dayjs from 'dayjs';
-import { FC, useCallback, useState } from 'react';
+import { FC } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -9,10 +9,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useCalendar, DayItem } from '../hooks/useCalendar';
 
-const days = ['일', '월', '화', '수', '목', '금', '토'];
+const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
-// 월 표기
 const months = [
   '01',
   '02',
@@ -28,60 +28,19 @@ const months = [
   '12',
 ];
 
-type dayItem = {
-  day: number;
-  isInCurrentMonth: boolean;
-  colIndex: number;
-};
-
 const CELL_SIZE = 40;
 
 const Calendar: FC = () => {
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
-  const [selectedDay, setSelectedDay] = useState<number>(-1);
+  const {
+    currentMonth,
+    selectedDay,
+    days,
+    handleClickNextMonth,
+    handleClickPreviousMonth,
+    handleDayPress,
+  } = useCalendar();
 
-  const handleClickNextMonth = () => {
-    setSelectedDay(-1);
-    setCurrentMonth(currentMonth.add(1, 'month'));
-  };
-
-  const handleClickPreviousMonth = () => {
-    setSelectedDay(-1);
-    setCurrentMonth(currentMonth.add(-1, 'month'));
-  };
-
-  const generateDays = () => {
-    const daysArray: dayItem[] = [];
-    const firstDay = currentMonth.startOf('month').day();
-    const maxDate = currentMonth.endOf('month').date();
-    const maxDateOfPreviousMonth = currentMonth
-      .add(-1, 'month')
-      .endOf('month')
-      .date();
-
-    for (let i = 0; i < 42; i++) {
-      const colIndex = i % 7;
-      const index = i - firstDay;
-      const isInCurrentMonth = index >= 0 && index < maxDate;
-      let cellValue: number;
-
-      if (isInCurrentMonth) {
-        cellValue = index + 1;
-      } else if (index < 0) {
-        cellValue = maxDateOfPreviousMonth + index + 1;
-      } else {
-        cellValue = index - maxDate + 1;
-      }
-      daysArray.push({
-        day: cellValue,
-        isInCurrentMonth,
-        colIndex: colIndex,
-      });
-    }
-    return daysArray;
-  };
-
-  const getTextStyle = (args: { colIndex: number; item: dayItem }) => {
+  const getTextStyle = (args: { colIndex: number; item: DayItem }) => {
     const { colIndex, item } = args;
 
     let textStyle = item.isInCurrentMonth
@@ -103,69 +62,45 @@ const Calendar: FC = () => {
     return textStyle;
   };
 
-  const handleDayPress = useCallback(
-    (args: { day: number; isInCurrentMonth: boolean }) => {
-      const { day, isInCurrentMonth } = args;
-
-      if (!isInCurrentMonth) {
-        const isNextMonth = day < 15;
-        const addMonthValue = isNextMonth ? 1 : -1;
-        setCurrentMonth(prev => prev.add(addMonthValue, 'month'));
-      }
-      setSelectedDay(day);
-    },
-    [],
-  );
-
-  const renderCalendarCell = ({ item }: { item: dayItem }) => {
+  const renderCalendarCell = ({ item }: { item: DayItem }) => {
     const textStyle = getTextStyle({ colIndex: item.colIndex, item });
     return (
       <TouchableOpacity
         style={styles.cell}
-        onPress={() =>
-          handleDayPress({
-            day: item.day,
-            isInCurrentMonth: item.isInCurrentMonth,
-          })
-        }
+        onPress={() => handleDayPress(item.day, item.isInCurrentMonth)}
       >
         <Text style={textStyle}>{item.day}</Text>
       </TouchableOpacity>
     );
   };
 
-  const CalendarBody = () => {
-    const days = generateDays();
-    return (
-      <FlatList
-        data={days}
-        renderItem={renderCalendarCell}
-        keyExtractor={(_, index) => `day-${index}`}
-        numColumns={7}
-        scrollEnabled={false}
-      />
-    );
-  };
+  const CalendarBody = () => (
+    <FlatList
+      data={days}
+      renderItem={renderCalendarCell}
+      keyExtractor={(_, index) => `day-${index}`}
+      numColumns={7}
+      scrollEnabled={false}
+    />
+  );
 
-  const CalendarHeader = () => {
-    return (
-      <View style={styles.row}>
-        {days.map((value, index) => {
-          const textStyle =
-            index === 0
-              ? styles.cellTextRed
-              : index === 6
-              ? styles.cellTextBlue
-              : styles.cellText;
-          return (
-            <View key={`${value}-${index}`} style={styles.cell}>
-              <Text style={textStyle}>{value}</Text>
-            </View>
-          );
-        })}
-      </View>
-    );
-  };
+  const CalendarWeekDayHeader = () => (
+    <View style={styles.row}>
+      {weekDays.map((day, index) => {
+        const textStyle =
+          index === 0
+            ? styles.cellTextRed
+            : index === 6
+            ? styles.cellTextBlue
+            : styles.cellText;
+        return (
+          <View key={`${day}-${index}`} style={styles.cell}>
+            <Text style={textStyle}>{day}</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -183,7 +118,7 @@ const Calendar: FC = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.calendarContainer}>
-          <CalendarHeader />
+          <CalendarWeekDayHeader />
           <CalendarBody />
         </View>
       </View>
@@ -219,15 +154,6 @@ const styles = StyleSheet.create({
     height: CELL_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  headerText: {
-    color: colors.grayscale[100],
-  },
-  headerTextRed: {
-    color: colors.calendar.holiday,
-  },
-  headerTextBlue: {
-    color: colors.calendar.saterday,
   },
   cellText: {
     color: colors.calendar.normal,
