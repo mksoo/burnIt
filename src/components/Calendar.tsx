@@ -32,61 +32,22 @@ type dayItem = {
 };
 
 const Calendar: FC = () => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDay, setSelectedDay] = useState<number>(-1);
-  const [checkDate, setCheckDate] = useState(''); // 선택한 날짜 포맷 'YYYY-MM-DD'
-
-  // const goToNextMonth = () => {
-  //   setCurrentMonth(currentMonth.add(1, 'month'));
-  // };
-
-  // const goToPreviousMonth = () => {
-  //   setCurrentMonth(currentMonth.add(-1, 'month'));
-  // };
 
   const goToNextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
-    );
+    setCurrentMonth(currentMonth.add(1, 'month'));
   };
 
   const goToPreviousMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
-    );
+    setCurrentMonth(currentMonth.add(-1, 'month'));
   };
-
-  // const generateMatrix = () => {
-  //   let matrix = [];
-  //   matrix[0] = days;
-
-  //   let year = currentMonth.year();
-  //   let month = currentMonth.month();
-  //   let firstDay = currentMonth.startOf('month').day();
-  //   let maxDays = currentMonth.endOf('month').date();
-
-  //   let counter = -firstDay + 1; // 첫 주의 첫 날짜를 계산
-  //   for (let row=1; row < 7; row++) {
-  //     matrix[row] = [];
-  //     for (let col = 0; col < 7; col++) {
-  //       let cellValue = counter > 0 && counter <= maxDays ? counter : '';
-  //       matrix[row][col] = {
-  //         day: cellValue,
-  //         isInCurrentMonth: counter > 0 && counter <= maxDays
-  //       };
-  //     }
-  //   }
-  // }
 
   const generateMatrix = () => {
     let matrix: dayItem[][] = [];
 
-    let year = currentMonth.getFullYear();
-    let month = currentMonth.getMonth();
-    let firstDay = new Date(year, month, 1).getDay();
-    // let firstDayJs = dayjs(currentMonth).startOf('month').day();
-    let maxDays = new Date(year, month + 1, 0).getDate();
-    // const maxDaysJs = dayjs(currentMonth).endOf('month').date();
+    let firstDay = currentMonth.startOf('month').day();
+    let maxDays = currentMonth.endOf('month').date();
 
     let counter = -firstDay + 1; // 첫 주의 첫 날짜를 계산
     for (let row = 0; row < 6; row++) {
@@ -195,33 +156,26 @@ const Calendar: FC = () => {
 
   const handleDayPress = (args: { day: number; isInCurrentMonth: boolean }) => {
     const { day, isInCurrentMonth } = args;
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
+    const year = currentMonth.year();
+    const month = currentMonth.month();
 
     if (!isInCurrentMonth) {
       // 클릭한 날짜가 현재 월이 아니면 월을 바꾼다.
       const isNextMonth = day < 15;
       const newMonth = isNextMonth ? month + 1 : month - 1;
       const newYear = newMonth < 0 ? year - 1 : newMonth > 11 ? year + 1 : year;
-      const adjustedMonth = (newMonth + 12) % 12;
 
-      const newCurrentMonth = new Date(newYear, adjustedMonth, 1);
+      const newCurrentMonth = dayjs(`${newYear}-${newMonth}-01`);
+      console.log(newCurrentMonth);
       setCurrentMonth(newCurrentMonth);
 
-      const formattedMonth =
-        adjustedMonth < 9 ? `0${adjustedMonth + 1}` : adjustedMonth + 1;
-      const formattedDay = day < 10 ? `0${day}` : day;
-      const formattedDate = `${newYear}-${formattedMonth}-${formattedDay}`;
-
       setSelectedDay(day);
-      setCheckDate(formattedDate);
     } else {
       // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
       const formattedMonth = month < 9 ? `0${month + 1}` : month + 1;
       const formattedDay = day < 10 ? `0${day}` : day;
       const formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
       setSelectedDay(day);
-      setCheckDate(formattedDate);
     }
   };
 
@@ -233,8 +187,8 @@ const Calendar: FC = () => {
             <Text style={styles.monthLabel}>&lt; Prev</Text>
           </TouchableOpacity>
           <Text style={styles.monthLabel}>
-            {currentMonth.getFullYear()}.&nbsp;
-            {months[currentMonth.getMonth()]}
+            {currentMonth.year()}.&nbsp;
+            {months[currentMonth.month()]}
           </Text>
           <TouchableOpacity onPress={goToNextMonth}>
             <Text style={styles.monthLabel}>Next &gt;</Text>
