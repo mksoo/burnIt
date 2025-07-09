@@ -14,8 +14,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    paddingHorizontal: 11,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   calendarContainer: {
     justifyContent: 'space-between',
@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
     color: colors.grayscale[500],
   },
   selectedDay: {
-    borderColor: 'red',
+    borderColor: 'blue',
     borderWidth: 1,
     borderRadius: 20,
     textAlign: 'center',
