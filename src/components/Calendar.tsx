@@ -27,14 +27,13 @@ const months = [
 ];
 
 type dayItem = {
-  day: number;
+  day: number | undefined;
   isInCurrentMonth: boolean;
 };
 
 const Calendar: FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<number>(-1);
-  const [specificDates, setSpecificDates] = useState<string[]>([]); // 특정 날짜
   const [checkDate, setCheckDate] = useState(''); // 선택한 날짜 포맷 'YYYY-MM-DD'
 
   // const goToNextMonth = () => {
@@ -80,18 +79,21 @@ const Calendar: FC = () => {
   // }
 
   const generateMatrix = () => {
-    var matrix: dayItem[][] = [];
+    let matrix: dayItem[][] = [];
 
-    var year = currentMonth.getFullYear();
-    var month = currentMonth.getMonth();
-    var firstDay = new Date(year, month, 1).getDay();
-    var maxDays = new Date(year, month + 1, 0).getDate();
+    let year = currentMonth.getFullYear();
+    let month = currentMonth.getMonth();
+    let firstDay = new Date(year, month, 1).getDay();
+    // let firstDayJs = dayjs(currentMonth).startOf('month').day();
+    let maxDays = new Date(year, month + 1, 0).getDate();
+    // const maxDaysJs = dayjs(currentMonth).endOf('month').date();
 
-    var counter = -firstDay + 1; // 첫 주의 첫 날짜를 계산
-    for (var row = 0; row < 6; row++) {
+    let counter = -firstDay + 1; // 첫 주의 첫 날짜를 계산
+    for (let row = 0; row < 6; row++) {
       matrix[row] = [];
-      for (var col = 0; col < 7; col++) {
-        let cellValue = counter > 0 && counter <= maxDays ? counter : 0;
+      for (let col = 0; col < 7; col++) {
+        const cellValue =
+          counter > 0 && counter <= maxDays ? counter : undefined;
         matrix[row][col] = {
           day: cellValue,
           isInCurrentMonth: counter > 0 && counter <= maxDays,
@@ -102,54 +104,34 @@ const Calendar: FC = () => {
     return matrix;
   };
 
-  const getTextStyle = (args: {
-    rowIndex: number;
-    colIndex: number;
-    item: dayItem;
-  }) => {
-    const { rowIndex, colIndex, item } = args;
-    if (rowIndex !== 0) {
-      const year = currentMonth.getFullYear();
-      const month = currentMonth.getMonth() + 1; // 월은 0부터 인덱스가 지정됩니다. 1을 추가하세요
-      const formattedMonth = month < 10 ? `0${month}` : month;
-      const formattedDay = item.day < 10 ? `0${item.day}` : item.day;
-      const fullDate = `${year}-${formattedMonth}-${formattedDay}`; // 'YYYY-MM-DD'와 일치하도록 조정
+  const getTextStyle = (args: { colIndex: number; item: dayItem }) => {
+    const { colIndex, item } = args;
 
-      let textStyle = item.isInCurrentMonth
-        ? colIndex === 0
-          ? styles.cellTextRed
-          : colIndex === 6
-          ? styles.cellTextBlue
-          : styles.cellText
-        : colIndex === 0
-        ? { ...styles.cellTextRed, ...styles.cellTextGrayOpacity }
+    let textStyle = item.isInCurrentMonth
+      ? colIndex === 0
+        ? styles.cellTextRed
         : colIndex === 6
-        ? { ...styles.cellTextBlue, ...styles.cellTextGrayOpacity }
-        : { ...styles.cellTextGray, ...styles.cellTextGrayOpacity };
+        ? styles.cellTextBlue
+        : styles.cellText
+      : colIndex === 0
+      ? { ...styles.cellTextRed, ...styles.cellTextGrayOpacity }
+      : colIndex === 6
+      ? { ...styles.cellTextBlue, ...styles.cellTextGrayOpacity }
+      : { ...styles.cellTextGray, ...styles.cellTextGrayOpacity };
 
-      if (item.isInCurrentMonth && specificDates.includes(fullDate)) {
-        textStyle = { ...textStyle, ...styles.specificDate };
-      }
-
-      if (item.day === selectedDay && item.isInCurrentMonth) {
-        textStyle = styles.selectedDay;
-      }
-
-      return textStyle;
-    } else {
-      return colIndex === 0
-        ? styles.headerTextRed
-        : colIndex === 6
-        ? styles.headerTextBlue
-        : styles.headerText;
+    if (item.day === selectedDay && item.isInCurrentMonth) {
+      textStyle = styles.selectedDay;
     }
+
+    return textStyle;
   };
 
   const renderCalendar = () => {
+    // 여기다가 요일 header 추가하면 될 듯.
     const matrix = generateMatrix();
-    var rows = matrix.map((row, rowIndex) => {
-      var rowItems = row.map((item, colIndex) => {
-        const textStyle = getTextStyle({ rowIndex, colIndex, item }); // 날짜 스타일 결정
+    let rows = matrix.map((row, rowIndex) => {
+      let rowItems = row.map((item, colIndex) => {
+        const textStyle = getTextStyle({ colIndex, item }); // 날짜 스타일 결정
         return (
           <TouchableOpacity
             style={styles.cell}
@@ -180,6 +162,7 @@ const Calendar: FC = () => {
     const month = currentMonth.getMonth();
 
     if (!isInCurrentMonth) {
+      // 클릭한 날짜가 현재 월이 아니면 월을 바꾼다.
       const isNextMonth = day < 15;
       const newMonth = isNextMonth ? month + 1 : month - 1;
       const newYear = newMonth < 0 ? year - 1 : newMonth > 11 ? year + 1 : year;
@@ -196,6 +179,7 @@ const Calendar: FC = () => {
       setSelectedDay(day);
       setCheckDate(formattedDate);
     } else {
+      // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
       const formattedMonth = month < 9 ? `0${month + 1}` : month + 1;
       const formattedDay = day < 10 ? `0${day}` : day;
       const formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
