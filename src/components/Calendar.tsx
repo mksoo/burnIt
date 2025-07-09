@@ -105,7 +105,7 @@ const Calendar: FC = () => {
     return (
       <TouchableOpacity
         style={styles.cell}
-        key={colIndex}
+        key={`date-${colIndex}`}
         onPress={() =>
           handleDayPress({
             day: item.day ?? 0,
@@ -124,7 +124,7 @@ const Calendar: FC = () => {
       <CalendarDate item={item} colIndex={colIndex} />
     ));
     return (
-      <View style={styles.row} key={rowIndex}>
+      <View key={`week-${rowIndex}`} style={styles.row}>
         {rowItems}
       </View>
     );
@@ -156,7 +156,7 @@ const Calendar: FC = () => {
 
           const textStyle = renderTextStyle({ index }); // 날짜 스타일 결정
           return (
-            <View style={styles.cell}>
+            <View key={`${value}-${index}`} style={styles.cell}>
               <Text style={textStyle}>{value}</Text>
             </View>
           );
