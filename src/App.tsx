@@ -6,14 +6,16 @@
  */
 import { NavigationContainer } from '@react-navigation/native';
 import RootStack from './screens/RootStack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function App() {
   return (
-    <NavigationContainer>
-      <RootStack/>
-    </NavigationContainer>
+    <GestureHandlerRootView>
+      <NavigationContainer>
+        <RootStack />
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
-
 
 export default App;
