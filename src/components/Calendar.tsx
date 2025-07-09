@@ -44,22 +44,34 @@ const Calendar: FC = () => {
   };
 
   const generateMatrix = () => {
-    let matrix: dayItem[][] = [];
+    const matrix: dayItem[][] = [];
 
-    let firstDay = currentMonth.startOf('month').day();
-    let maxDays = currentMonth.endOf('month').date();
+    const firstDay = currentMonth.startOf('month').day();
+    const maxDate = currentMonth.endOf('month').date();
+    const maxDateOfPreviousMonth = currentMonth
+      .add(-1, 'month')
+      .endOf('month')
+      .date();
 
-    let counter = -firstDay + 1; // 첫 주의 첫 날짜를 계산
+    let index = -firstDay + 1; // 첫 주의 첫 날짜를 계산
     for (let row = 0; row < 6; row++) {
       matrix[row] = [];
       for (let col = 0; col < 7; col++) {
-        const cellValue =
-          counter > 0 && counter <= maxDays ? counter : undefined;
+        const isInCurrentMonth = index > 0 && index <= maxDate;
+        let cellValue: number;
+
+        if (isInCurrentMonth) {
+          cellValue = index;
+        } else if (index <= 0) {
+          cellValue = maxDateOfPreviousMonth + index;
+        } else {
+          cellValue = index - maxDate;
+        }
         matrix[row][col] = {
           day: cellValue,
-          isInCurrentMonth: counter > 0 && counter <= maxDays,
+          isInCurrentMonth,
         };
-        counter++;
+        index++;
       }
     }
     return matrix;
@@ -119,7 +131,6 @@ const Calendar: FC = () => {
   };
 
   const CalendarBody = () => {
-    // 여기다가 요일 header 추가하면 될 듯.
     const matrix = generateMatrix();
     const rows = matrix.map((row, rowIndex) => (
       <CalendarWeek rowIndex={rowIndex} row={row} />
@@ -166,7 +177,6 @@ const Calendar: FC = () => {
       const newYear = newMonth < 0 ? year - 1 : newMonth > 11 ? year + 1 : year;
 
       const newCurrentMonth = dayjs(`${newYear}-${newMonth}-01`);
-      console.log(newCurrentMonth);
       setCurrentMonth(newCurrentMonth);
     }
     // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
