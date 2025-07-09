@@ -160,7 +160,7 @@ const Calendar: FC = () => {
     const month = currentMonth.month();
 
     if (!isInCurrentMonth) {
-      // 클릭한 날짜가 현재 월이 아니면 월을 바꾼다.
+      // 클릭한 날짜가 현재 월이 아니면 월로 바꾼다.
       const isNextMonth = day < 15;
       const newMonth = isNextMonth ? month + 1 : month - 1;
       const newYear = newMonth < 0 ? year - 1 : newMonth > 11 ? year + 1 : year;
@@ -168,15 +168,9 @@ const Calendar: FC = () => {
       const newCurrentMonth = dayjs(`${newYear}-${newMonth}-01`);
       console.log(newCurrentMonth);
       setCurrentMonth(newCurrentMonth);
-
-      setSelectedDay(day);
-    } else {
-      // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
-      const formattedMonth = month < 9 ? `0${month + 1}` : month + 1;
-      const formattedDay = day < 10 ? `0${day}` : day;
-      const formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
-      setSelectedDay(day);
     }
+    // 클릭한 날짜가 현재 월이면 동그라미 표시만 한다.
+    setSelectedDay(day);
   };
 
   return (
