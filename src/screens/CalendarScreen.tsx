@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { MainTabScreenProps } from './navigation';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import Calendar from '@/components/Calendar';
 
 const CalendarScreen: FC<MainTabScreenProps<'Calendar'>> = () => {
