@@ -7,4 +7,9 @@ export const colors = {
     500: '#757575',
     900: '#f5f5f5',
   },
+  calendar: {
+    holiday: 'red',
+    saterday: 'blue',
+    normal: 'black',
+  },
 };

@@ -7,18 +7,28 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import HomeIcon from '@/assets/home.svg';
-import CalendarIcon from '@/assets/calendar.svg';
-import LibraryIcon from '@/assets/library.svg';
-import ProfileIcon from '@/assets/profile.svg';
+import HomeIcon from '@/assets/icons/home.svg';
+import CalendarIcon from '@/assets/icons/calendar.svg';
+import LibraryIcon from '@/assets/icons/library.svg';
+import ProfileIcon from '@/assets/icons/profile.svg';
+import ChevronRightIcon from '@/assets/icons/chevron-right.svg';
+import ChevronLeftIcon from '@/assets/icons/chevron-left.svg';
 
-export type IconName = 'home' | 'calendar' | 'library' | 'profile';
+export type IconName =
+  | 'home'
+  | 'calendar'
+  | 'library'
+  | 'profile'
+  | 'chevron-left'
+  | 'chevron-right';
 
 const IconMap: { [key in IconName]: FC<any> } = {
   home: HomeIcon,
   calendar: CalendarIcon,
   library: LibraryIcon,
   profile: ProfileIcon,
+  'chevron-left': ChevronLeftIcon,
+  'chevron-right': ChevronRightIcon,
 };
 
 interface Props {
