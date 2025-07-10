@@ -35,6 +35,7 @@ const CalendarMonthGridView: FC<Props> = ({selectedDay, monthDays, handleDayPres
   const renderCalendarCell = ({ item }: { item: DayItem }) => {
     const textStyle = getTextStyle({ item });
     const date = item.day.date();
+    const isSelected = item.day.isSame(selectedDay, 'day');
     return (
       <TouchableOpacity
         style={styles.cell}
@@ -43,7 +44,7 @@ const CalendarMonthGridView: FC<Props> = ({selectedDay, monthDays, handleDayPres
         <Text
           style={[
             textStyle,
-            selectedDay.isSame(item.day) ? styles.selectedDay : {},
+            isSelected ? styles.selectedDay : {},
           ]}
         >
           {date}
