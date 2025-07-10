@@ -1,15 +1,13 @@
 // src/components/Calendar/CalendarWeekView.tsx
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Text, TouchableOpacity, FlatList } from 'react-native';
 import dayjs, { Dayjs } from 'dayjs';
 import { DayItem, useCalendar } from '@/hooks/useCalendar';
-import { CalendarHeader } from './CalendarHeader';
-import { WeekDayHeader } from './WeekDayHeader';
 import { styles } from './styles';
 
 const CalendarWeekView = () => {
-  const { currentMonth, selectedDay, handleDayPress } = useCalendar();
+  const { selectedDay, setSelectedDay } = useCalendar();
 
   const [startOfWeek, setStartOfWeek] = useState<Dayjs>(
     selectedDay.startOf('week'),
@@ -20,20 +18,12 @@ const CalendarWeekView = () => {
       const day = startOfWeek.add(i, 'day');
       return {
         day,
-        isInCurrentMonth: day.isSame(currentMonth, 'month'),
         colIndex: day.day(),
       };
     });
     return days;
-  }, [selectedDay, currentMonth, startOfWeek]);
+  }, [selectedDay, startOfWeek]);
 
-  const handlePressPreviousWeek = () => {
-    setStartOfWeek(prev => prev.subtract(1, 'week'));
-  };
-
-  const handlePressNextWeek = () => {
-    setStartOfWeek(prev => prev.add(1, 'week'));
-  };
 
   const getDayTextStyle = (args: {
     day: Dayjs
@@ -51,13 +41,13 @@ const CalendarWeekView = () => {
   const renderItem = useCallback(
     (args: { item: DayItem }) => {
       const { item } = args;
-      const { day, isInCurrentMonth } = item;
+      const { day } = item;
       const isSelected = dayjs(day).isSame(selectedDay, 'day');
       return (
         <TouchableOpacity
           key={day.toString()}
           style={styles.cell}
-          onPress={() => handleDayPress(day, isInCurrentMonth)}
+          onPress={() => setSelectedDay(day)}
         >
           <Text
             style={[
@@ -74,23 +64,13 @@ const CalendarWeekView = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <CalendarHeader
-        currentDay={startOfWeek}
-        onPressPrev={handlePressPreviousWeek}
-        onPressNext={handlePressNextWeek}
-      />
-      <WeekDayHeader />
-      <View style={styles.row}>
-        <FlatList
-          data={weekDays}
-          renderItem={renderItem}
-          keyExtractor={(_, index) => `day-${index}`}
-          numColumns={7}
-          scrollEnabled={false}
-        />
-      </View>
-    </View>
+    <FlatList
+      data={weekDays}
+      renderItem={renderItem}
+      keyExtractor={(_, index) => `day-${index}`}
+      numColumns={7}
+      scrollEnabled={false}
+    />
   );
 };
 

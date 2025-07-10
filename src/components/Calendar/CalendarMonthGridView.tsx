@@ -1,22 +1,22 @@
-import React, { FC } from 'react';
-import { FlatList, Text, TouchableOpacity } from 'react-native';
-import { DayItem } from '@/hooks/useCalendar';
+import React, { FC, useCallback, useMemo, useState } from 'react';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { DayItem, useCalendar } from '@/hooks/useCalendar';
 import { styles } from './styles';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { WeekDayHeader } from './WeekDayHeader';
+import { CalendarHeader } from './CalendarHeader';
 
-interface CalendarGridProps {
-  days: DayItem[];
+interface Props {
   selectedDay: Dayjs;
-  onDayPress: (day: Dayjs, isInCurrentMonth: boolean) => void;
+  monthDays: DayItem[];
+  handleDayPress: (args: {dayItem: DayItem}) => void;
 }
 
-const CalendarMonthGridView: FC<CalendarGridProps> = ({
-  days,
-  selectedDay,
-  onDayPress,
-}) => {
-  const getTextStyle = (args: { colIndex: number; item: DayItem }) => {
-    const { colIndex, item } = args;
+const CalendarMonthGridView: FC<Props> = ({selectedDay, monthDays, handleDayPress}) => {
+
+  const getTextStyle = (args: { item: DayItem }) => {
+    const { item } = args;
+    const colIndex = item.day.day();
 
     let textStyle = item.isInCurrentMonth
       ? colIndex === 0
@@ -34,12 +34,12 @@ const CalendarMonthGridView: FC<CalendarGridProps> = ({
   };
 
   const renderCalendarCell = ({ item }: { item: DayItem }) => {
-    const textStyle = getTextStyle({ colIndex: item.colIndex, item });
+    const textStyle = getTextStyle({ item });
     const date = item.day.date();
     return (
       <TouchableOpacity
         style={styles.cell}
-        onPress={() => onDayPress(item.day, item.isInCurrentMonth)}
+        onPress={() => handleDayPress({dayItem: item})}
       >
         <Text
           style={[
@@ -53,14 +53,16 @@ const CalendarMonthGridView: FC<CalendarGridProps> = ({
     );
   };
 
+  console.log('selectedDay', selectedDay);
+
   return (
-    <FlatList
-      data={days}
-      renderItem={renderCalendarCell}
-      keyExtractor={(_, index) => `day-${index}`}
-      numColumns={7}
-      scrollEnabled={false}
-    />
+      <FlatList
+        data={monthDays}
+        renderItem={renderCalendarCell}
+        keyExtractor={(_, index) => `day-${index}`}
+        numColumns={7}
+        scrollEnabled={false}
+      />
   );
 };
 

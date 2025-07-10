@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { useCalendar } from '@/hooks/useCalendar';
 import { CalendarHeader } from './CalendarHeader';
@@ -8,32 +8,28 @@ import { styles } from './styles';
 import CalendarWeekView from './CalendarWeekView';
 
 const Calendar: React.FC = () => {
-  const {
-    currentMonth,
-    selectedDay,
-    days,
-    handleClickNextMonth,
-    handleClickPreviousMonth,
-    handleDayPress,
-  } = useCalendar();
+  const {selectedDay, currentMonth, monthDays, handleDayPress, handleClickPrevious, handleClickNext, viewType} = useCalendar();
+
 
   return (
-    // <View style={styles.container}>
-    //   <CalendarHeader
-    //     currentDay={currentMonth}
-    //     onPressPrev={handleClickPreviousMonth}
-    //     onPressNext={handleClickNextMonth}
-    //   />
-    //   <View style={styles.calendarContainer}>
-    //     <WeekDayHeader />
-    //     <CalendarMonthGridView
-    //       days={days}
-    //       selectedDay={selectedDay}
-    //       onDayPress={handleDayPress}
-    //     />
-    //   </View>
-    // </View>
-    <CalendarWeekView />
+    <View style={styles.container}>
+      <CalendarHeader
+        currentDay={currentMonth}
+        onPressPrev={handleClickPrevious}
+        onPressNext={handleClickNext}
+      />
+      <View style={styles.calendarContainer}>
+        <WeekDayHeader />
+        {viewType==="MONTH" ? 
+          <CalendarMonthGridView 
+            selectedDay={selectedDay}
+            monthDays={monthDays} 
+            handleDayPress={handleDayPress}/>
+          :
+          <CalendarWeekView />
+        }
+      </View>
+    </View>
   );
 };
 

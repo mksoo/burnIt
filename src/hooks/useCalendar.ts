@@ -3,43 +3,37 @@ import { useState, useCallback, useMemo } from 'react';
 
 export type DayItem = {
   day: Dayjs;
-  isInCurrentMonth: boolean;
-  colIndex: number;
+  isInCurrentMonth?: boolean;
 };
 
 export const useCalendar = () => {
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
+  const [currentMonth, setCurrentMonth] = useState(dayjs());
 
-  const handleClickNextMonth = useCallback(() => {
-    setCurrentMonth(prev => prev.add(1, 'month'));
-  }, [currentMonth]);
+  const [viewType, setViewType] = useState<"MONTH" | "WEEK">("MONTH");
 
-  const handleClickPreviousMonth = useCallback(() => {
-    setCurrentMonth(prev => prev.subtract(1, 'month'));
+  const handleClickNext = useCallback(() => {
+    if (viewType === "MONTH") {
+      setCurrentMonth(prev => prev.add(1, 'month'));
+    } else {
+      setCurrentMonth(prev => prev.add(1, 'week'));
+    }
+  }, [viewType]);
 
-  }, [currentMonth]);
+  const handleClickPrevious = useCallback(() => {
+    if (viewType === "MONTH") {
+      setCurrentMonth(prev => prev.subtract(1, 'month'));
+    } else {
+      setCurrentMonth(prev => prev.subtract(1, 'week'));
+    }
+  }, [viewType]);
 
-  const handleDayPress = useCallback(
-    (day: Dayjs, isInCurrentMonth: boolean) => {
-      if (!isInCurrentMonth) {
-        const date = day.date();
-        const isNextMonth = date < 15;
-        const addMonthValue = isNextMonth ? 1 : -1;
-        setCurrentMonth(prev => prev.add(addMonthValue, 'month'));
-      }
-      setSelectedDay(day);
-    },
-    [],
-  );
-
-  const days = useMemo(() => {
+  const monthDays = useMemo(() => {
     const daysArray: DayItem[] = [];
     const firstDay = currentMonth.startOf('month').day();
     const maxDate = currentMonth.endOf('month').date();
 
     for (let i = 0; i < 42; i++) {
-      const colIndex = i % 7;
       const index = i - firstDay;
       const isInCurrentMonth = index >= 0 && index < maxDate;
       const cellValue = currentMonth.startOf('month').add(index, 'day');
@@ -47,18 +41,35 @@ export const useCalendar = () => {
       daysArray.push({
         day: cellValue,
         isInCurrentMonth,
-        colIndex: colIndex,
       });
     }
     return daysArray;
   }, [currentMonth]);
 
+  const handleDayPress = useCallback(
+    (args: {dayItem: DayItem}) => {
+      const {dayItem} = args;
+      if (!dayItem?.isInCurrentMonth) {
+        const date = dayItem.day.date();
+        const isNextMonth = date < 15;
+        const addMonthValue = isNextMonth ? 1 : -1;
+        setCurrentMonth(prev => prev.add(addMonthValue, 'month'));
+      }
+      setSelectedDay(dayItem.day);
+    },
+    [],
+  );
+
   return {
-    currentMonth,
-    selectedDay,
-    days,
-    handleClickNextMonth,
-    handleClickPreviousMonth,
+    monthDays,
     handleDayPress,
+    selectedDay,
+    setSelectedDay,
+    currentMonth,
+    setCurrentMonth,
+    viewType,
+    setViewType,
+    handleClickPrevious,
+    handleClickNext
   };
 };
