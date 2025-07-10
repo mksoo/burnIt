@@ -6,7 +6,7 @@ export type DayItem = {
   isInCurrentMonth?: boolean;
 };
 
-const getWeekDays = (args: {viewDay: Dayjs}) => {
+export const getWeekDays = (args: {viewDay: Dayjs}) => {
   const {viewDay} = args;
   const days = Array.from({ length: 7 }, (_, i) => {
     const startOfWeek = viewDay.startOf('week');
@@ -19,7 +19,7 @@ const getWeekDays = (args: {viewDay: Dayjs}) => {
   return days;
 }
 
-const getMonthDays = (args: {viewDay: Dayjs}) => {
+export const getMonthDays = (args: {viewDay: Dayjs}) => {
   const {viewDay} = args;
   const daysArray: DayItem[] = [];
     const firstDay = viewDay.startOf('month').day();
