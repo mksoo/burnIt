@@ -14,14 +14,11 @@ const Calendar: FC = () => {
   const {
     weekDays,
     selectedDay,
-    setSelectedDay,
-    currentWeek,
-    currentMonth,
+    viewDay,
     monthDays,
     handleDayPress,
     handleClickPrevious,
     handleClickNext,
-    viewType,
     setViewType
   } = useCalendar();
 
@@ -61,7 +58,7 @@ const Calendar: FC = () => {
   return (
     <View style={styles.container}>
       <CalendarHeader
-        currentDay={viewType === "MONTH" ? currentMonth : currentWeek}
+        currentDay={viewDay}
         onPressPrev={handleClickPrevious}
         onPressNext={handleClickNext}
       />
