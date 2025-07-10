@@ -55,7 +55,6 @@ const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, handleDayPress, styl
   return (
     <FlatList
       contentContainerStyle={{
-        flex: 1,
         justifyContent: 'center',
       }}
       style={style}

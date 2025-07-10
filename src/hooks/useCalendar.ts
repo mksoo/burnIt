@@ -6,6 +6,38 @@ export type DayItem = {
   isInCurrentMonth?: boolean;
 };
 
+const getWeekDays = (args: {viewDay: Dayjs}) => {
+  const {viewDay} = args;
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const startOfWeek = viewDay.startOf('week');
+    const day = startOfWeek.add(i, 'day');
+    return {
+      day,
+      colIndex: day.day(),
+    };
+  });
+  return days;
+}
+
+const getMonthDays = (args: {viewDay: Dayjs}) => {
+  const {viewDay} = args;
+  const daysArray: DayItem[] = [];
+    const firstDay = viewDay.startOf('month').day();
+    const maxDate = viewDay.endOf('month').date();
+
+    for (let i = 0; i < 42; i++) {
+      const index = i - firstDay;
+      const isInCurrentMonth = index >= 0 && index < maxDate;
+      const cellValue = viewDay.startOf('month').add(index, 'day');
+
+      daysArray.push({
+        day: cellValue,
+        isInCurrentMonth,
+      });
+    }
+    return daysArray;
+}
+
 export const useCalendar = () => {
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
   const [viewDay, setViewDay] = useState<Dayjs>(dayjs());
@@ -29,34 +61,19 @@ export const useCalendar = () => {
   }, [viewType]);
 
   const weekDays = useMemo(() => {
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const startOfWeek = viewDay.startOf('week');
-      const day = startOfWeek.add(i, 'day');
-      return {
-        day,
-        colIndex: day.day(),
-      };
-    });
-    return days;
-  }, [selectedDay, viewDay]);
+    return getWeekDays({viewDay});
+  }, [viewDay]);
 
   const monthDays = useMemo(() => {
-    const daysArray: DayItem[] = [];
-    const firstDay = viewDay.startOf('month').day();
-    const maxDate = viewDay.endOf('month').date();
-
-    for (let i = 0; i < 42; i++) {
-      const index = i - firstDay;
-      const isInCurrentMonth = index >= 0 && index < maxDate;
-      const cellValue = viewDay.startOf('month').add(index, 'day');
-
-      daysArray.push({
-        day: cellValue,
-        isInCurrentMonth,
-      });
-    }
-    return daysArray;
+    return getMonthDays({viewDay});
   }, [viewDay]);
+
+
+  const weekPositionRatio = useMemo(() => {
+    const weekIndex = monthDays.findIndex((item => item.day.isSame(viewDay, 'date')));
+    return Math.floor(weekIndex / 7);
+  }, [monthDays, viewDay]);
+
 
   const handleDayPress = useCallback(
     (args: {dayItem: DayItem}) => {
@@ -76,6 +93,7 @@ export const useCalendar = () => {
   return {
     weekDays,
     monthDays,
+    weekPositionRatio,
     handleDayPress,
     selectedDay,
     setSelectedDay,

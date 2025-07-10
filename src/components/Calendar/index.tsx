@@ -16,6 +16,7 @@ const Calendar: FC = () => {
     selectedDay,
     viewDay,
     monthDays,
+    weekPositionRatio,
     handleDayPress,
     handleClickPrevious,
     handleClickNext,
@@ -51,9 +52,14 @@ const Calendar: FC = () => {
     opacity: (viewHeight.value - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT),
     height: viewHeight.value,
   }));
-  const weekAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: 1 - (viewHeight.value - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT),
-  }))
+  const weekAnimatedStyle = useAnimatedStyle(() => {    
+  const oneToZero = 1 - (viewHeight.value - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
+  const topRatio = 100/6*weekPositionRatio;
+
+  return {
+    opacity: Math.ceil(oneToZero),
+    top: `${topRatio - topRatio * oneToZero}%`,
+  }})
 
   return (
     <View style={styles.container}>
@@ -74,18 +80,23 @@ const Calendar: FC = () => {
                 monthDays={monthDays}
                 handleDayPress={handleDayPress} />
             </Animated.View>
-          <Animated.View style={[weekAnimatedStyle, {
+          <View style={{
               position: 'absolute', // 다른 컴포넌트 위에 덮음
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-            }]}>
+            }}>
+              <Animated.View style={[weekAnimatedStyle, {
+                position: 'absolute',
+                width: '100%',
+              }]}>
               <CalendarWeekView
                 weekDays={weekDays}
                 selectedDay={selectedDay}
                 handleDayPress={handleDayPress}/>
-            </Animated.View>
+              </Animated.View>
+            </View>
           </View>
         </GestureDetector>
       </View>
