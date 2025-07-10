@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useCalendar } from '@/hooks/useCalendar';
 import { CalendarHeader } from './CalendarHeader';
 import { WeekDayHeader } from './WeekDayHeader';
-import { CalendarGrid } from './CalendarGrid';
+import CalendarMonthGridView from './CalendarMonthGridView';
 import { styles } from './styles';
 
 const Calendar: React.FC = () => {
@@ -25,7 +25,7 @@ const Calendar: React.FC = () => {
       />
       <View style={styles.calendarContainer}>
         <WeekDayHeader />
-        <CalendarGrid
+        <CalendarMonthGridView
           days={days}
           selectedDay={selectedDay}
           onDayPress={handleDayPress}

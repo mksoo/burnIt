@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { FlatList, Text, TouchableOpacity } from 'react-native';
 import { DayItem } from '@/hooks/useCalendar';
 import { styles } from './styles';
@@ -10,7 +10,7 @@ interface CalendarGridProps {
   onDayPress: (day: Dayjs, isInCurrentMonth: boolean) => void;
 }
 
-export const CalendarGrid: React.FC<CalendarGridProps> = ({
+const CalendarMonthGridView: FC<CalendarGridProps> = ({
   days,
   selectedDay,
   onDayPress,
@@ -63,3 +63,5 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     />
   );
 };
+
+export default CalendarMonthGridView;
