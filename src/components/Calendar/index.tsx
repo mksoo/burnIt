@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, {FC} from 'react';
 import { View } from 'react-native';
 import { useCalendar } from '@/hooks/useCalendar';
 import { CalendarHeader } from './CalendarHeader';
@@ -6,10 +6,9 @@ import { WeekDayHeader } from './WeekDayHeader';
 import CalendarMonthGridView from './CalendarMonthGridView';
 import { styles } from './styles';
 import CalendarWeekView from './CalendarWeekView';
-import Animated from 'react-native-reanimated';
 import Divider from '../common/Divider';
 
-const Calendar: React.FC = () => {
+const Calendar: FC = () => {
   const {
     weekDays,
     selectedDay,
