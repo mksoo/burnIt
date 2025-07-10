@@ -5,8 +5,9 @@ import { CalendarHeader } from './CalendarHeader';
 import { WeekDayHeader } from './WeekDayHeader';
 import CalendarMonthGridView from './CalendarMonthGridView';
 import { styles } from './styles';
-import CalendarWeekView from './CalendarWeekView';
 import Divider from '../common/Divider';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 const Calendar: FC = () => {
   const {
@@ -22,6 +23,20 @@ const Calendar: FC = () => {
     viewType,
   } = useCalendar();
 
+  const position = useSharedValue(0);
+
+  const gesture = Gesture.Pan()
+    .onUpdate((e) => {
+      position.value = e.translationY;
+      console.log(position.value, e.translationY);
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: position.value,
+  }));
+
+
+
   return (
     <View style={styles.container}>
       <CalendarHeader
@@ -31,7 +46,15 @@ const Calendar: FC = () => {
       />
       <View style={styles.calendarContainer}>
         <WeekDayHeader />
-        {viewType==="MONTH" ? 
+        <GestureDetector gesture={gesture}>
+          <Animated.View style={[animatedStyle]}>
+          <CalendarMonthGridView 
+            selectedDay={selectedDay}
+            monthDays={monthDays} 
+            handleDayPress={handleDayPress}/>
+          </Animated.View>
+        </GestureDetector>
+        {/* {viewType==="MONTH" ? 
           <CalendarMonthGridView 
             selectedDay={selectedDay}
             monthDays={monthDays} 
@@ -41,7 +64,7 @@ const Calendar: FC = () => {
             weekDays={weekDays}
             selectedDay={selectedDay}
             setSelectedDay={setSelectedDay}/>
-        }
+        } */}
       </View>
       <Divider style={{marginTop: 10}}/>
     </View>
