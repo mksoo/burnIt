@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import { getMonthDays, getWeekDays, useCalendar } from '@/hooks/useCalendar';
 import { CalendarHeader } from './CalendarHeader';
@@ -31,6 +31,8 @@ const Calendar: FC = () => {
   const MIN_HEIGHT = 50;
   const MAX_HEIGHT = 250;
 
+  const [isPendingSwipe, setIsPendingSwipe] = useState<boolean>(false);
+
   const viewHeight = useSharedValue(MAX_HEIGHT);
   const gestureStartHeight = useSharedValue(MAX_HEIGHT);
 
@@ -38,6 +40,13 @@ const Calendar: FC = () => {
   const translateX = useSharedValue(0);
 
   const movingMode = useSharedValue<'LEFT' | 'RIGHT' | null>(null);
+
+  useEffect(() => {
+    if (isPendingSwipe) {
+      translateX.value = 0;
+      setIsPendingSwipe(false);
+    }
+  }, [viewDay]);
 
   const gesture = Gesture.Pan()
     .onBegin(e => {
@@ -71,8 +80,7 @@ const Calendar: FC = () => {
           translateX.value = withTiming(SCREEN_WIDTH, { duration: 200 }, (finished) => {
             if (finished) {
               runOnJS(handleClickPrevious)();
-              // 애니메이션 값 초기화
-              translateX.value = 0;
+              runOnJS(setIsPendingSwipe)(true);
             }
           });
         } else {
@@ -85,8 +93,7 @@ const Calendar: FC = () => {
           translateX.value = withTiming(-SCREEN_WIDTH, { duration: 200 }, (finished) => {
             if (finished) {
               runOnJS(handleClickNext)();
-              // 애니메이션 값 초기화
-              translateX.value = 0;
+              runOnJS(setIsPendingSwipe)(true);
             }
           });
         } else {
