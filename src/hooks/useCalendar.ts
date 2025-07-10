@@ -12,11 +12,12 @@ export const useCalendar = () => {
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
 
   const handleClickNextMonth = useCallback(() => {
-    setCurrentMonth(currentMonth.add(1, 'month'));
+    setCurrentMonth(prev => prev.add(1, 'month'));
   }, [currentMonth]);
 
   const handleClickPreviousMonth = useCallback(() => {
-    setCurrentMonth(currentMonth.add(-1, 'month'));
+    setCurrentMonth(prev => prev.subtract(1, 'month'));
+
   }, [currentMonth]);
 
   const handleDayPress = useCallback(
