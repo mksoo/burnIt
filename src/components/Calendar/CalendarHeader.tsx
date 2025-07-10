@@ -20,13 +20,13 @@ const months = [
 ];
 
 interface CalendarHeaderProps {
-  currentMonth: dayjs.Dayjs;
+  currentDay: dayjs.Dayjs;
   onPressPrev: () => void;
   onPressNext: () => void;
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
-  currentMonth,
+  currentDay,
   onPressPrev,
   onPressNext,
 }) => {
@@ -37,7 +37,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         <Text style={styles.monthLabel}>Prev</Text>
       </TouchableOpacity>
       <Text style={styles.monthLabel}>
-        {`${currentMonth.year()}. ${months[currentMonth.month()]}`}
+        {`${currentDay.year()}. ${months[currentDay.month()]}`}
       </Text>
       <TouchableOpacity style={{ flexDirection: 'row' }} onPress={onPressNext}>
         <Text style={styles.monthLabel}>Next</Text>

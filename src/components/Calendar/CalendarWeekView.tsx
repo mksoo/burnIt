@@ -1,24 +1,21 @@
 // src/components/Calendar/CalendarWeekView.tsx
 
-import React, { useMemo } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import dayjs from 'dayjs';
-import { useCalendar } from '@/hooks/useCalendar';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import dayjs, { Dayjs } from 'dayjs';
+import { DayItem, useCalendar } from '@/hooks/useCalendar';
 import { CalendarHeader } from './CalendarHeader';
 import { WeekDayHeader } from './WeekDayHeader';
 import { styles } from './styles';
 
 const CalendarWeekView = () => {
-  const {
-    currentMonth,
-    selectedDay,
-    handleDayPress,
-    handleClickNextMonth,
-    handleClickPreviousMonth,
-  } = useCalendar();
+  const { currentMonth, selectedDay, handleDayPress } = useCalendar();
+
+  const [startOfWeek, setStartOfWeek] = useState<Dayjs>(
+    selectedDay.startOf('week'),
+  );
 
   const weekDays = useMemo(() => {
-    const startOfWeek = dayjs(selectedDay).startOf('week');
     const days = Array.from({ length: 7 }, (_, i) => {
       const day = startOfWeek.add(i, 'day');
       return {
@@ -28,16 +25,14 @@ const CalendarWeekView = () => {
       };
     });
     return days;
-  }, [selectedDay, currentMonth]);
+  }, [selectedDay, currentMonth, startOfWeek]);
 
   const handlePressPreviousWeek = () => {
-    const prevWeekDay = dayjs(selectedDay).subtract(7, 'days');
-    handleDayPress(prevWeekDay, prevWeekDay.isSame(currentMonth, 'month'));
+    setStartOfWeek(prev => prev.subtract(1, 'week'));
   };
 
   const handlePressNextWeek = () => {
-    const nextWeekDay = dayjs(selectedDay).add(7, 'days');
-    handleDayPress(nextWeekDay, nextWeekDay.isSame(currentMonth, 'month'));
+    setStartOfWeek(prev => prev.add(1, 'week'));
   };
 
   const getDayTextStyle = (
@@ -54,34 +49,47 @@ const CalendarWeekView = () => {
     return textStyle;
   };
 
+  const renderItem = useCallback(
+    (args: { item: DayItem }) => {
+      const { item } = args;
+      const { day, isInCurrentMonth, colIndex } = item;
+      const isSelected = dayjs(day).isSame(selectedDay, 'day');
+      return (
+        <TouchableOpacity
+          key={day.toString()}
+          style={styles.cell}
+          onPress={() => handleDayPress(day, isInCurrentMonth)}
+        >
+          <Text
+            style={[
+              getDayTextStyle(day, isInCurrentMonth, colIndex),
+              isSelected && styles.selectedDay,
+            ]}
+          >
+            {day.date()}
+          </Text>
+        </TouchableOpacity>
+      );
+    },
+    [selectedDay],
+  );
+
   return (
     <View style={styles.container}>
       <CalendarHeader
-        currentMonth={currentMonth}
+        currentDay={startOfWeek}
         onPressPrev={handlePressPreviousWeek}
         onPressNext={handlePressNextWeek}
       />
       <WeekDayHeader />
       <View style={styles.row}>
-        {weekDays.map(({ day, isInCurrentMonth, colIndex }) => {
-          const isSelected = dayjs(day).isSame(selectedDay, 'day');
-          return (
-            <TouchableOpacity
-              key={day.toString()}
-              style={styles.cell}
-              onPress={() => handleDayPress(day, isInCurrentMonth)}
-            >
-              <Text
-                style={[
-                  getDayTextStyle(day, isInCurrentMonth, colIndex),
-                  isSelected && styles.selectedDay,
-                ]}
-              >
-                {day.date()}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+        <FlatList
+          data={weekDays}
+          renderItem={renderItem}
+          keyExtractor={(_, index) => `day-${index}`}
+          numColumns={7}
+          scrollEnabled={false}
+        />
       </View>
     </View>
   );

@@ -20,7 +20,7 @@ const Calendar: React.FC = () => {
   return (
     // <View style={styles.container}>
     //   <CalendarHeader
-    //     currentMonth={currentMonth}
+    //     currentDay={currentMonth}
     //     onPressPrev={handleClickPreviousMonth}
     //     onPressNext={handleClickNextMonth}
     //   />
