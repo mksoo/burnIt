@@ -9,11 +9,11 @@ import { styles } from './styles';
 interface Props {
   weekDays: DayItem[];
   selectedDay: Dayjs;
-  setSelectedDay: (day: Dayjs) => void;
+  handleDayPress: (args: {dayItem: DayItem}) => void;
   style?: StyleProp<ViewStyle>;
 }
 
-const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, setSelectedDay, style}) => {
+const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, handleDayPress, style}) => {
   const getDayTextStyle = (args: {
     day: Dayjs
   }) => {
@@ -36,7 +36,7 @@ const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, setSelectedDay, styl
         <TouchableOpacity
           key={day.toString()}
           style={styles.cell}
-          onPress={() => setSelectedDay(day)}
+          onPress={() => handleDayPress({dayItem: item})}
         >
           <Text
             style={[

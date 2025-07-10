@@ -87,7 +87,7 @@ const Calendar: FC = () => {
               <CalendarWeekView
                 weekDays={weekDays}
                 selectedDay={selectedDay}
-                setSelectedDay={setSelectedDay}/>
+                handleDayPress={handleDayPress}/>
             </Animated.View>
           </View>
         </GestureDetector>
