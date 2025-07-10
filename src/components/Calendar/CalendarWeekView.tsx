@@ -35,15 +35,14 @@ const CalendarWeekView = () => {
     setStartOfWeek(prev => prev.add(1, 'week'));
   };
 
-  const getDayTextStyle = (
-    day: dayjs.Dayjs,
-    isInCurrentMonth: boolean,
-    colIndex: number,
-  ) => {
+  const getDayTextStyle = (args: {
+    day: Dayjs
+  }) => {
+    const {day} = args;
     const textStyle = [styles.cellText];
-    if (colIndex === 0) {
+    if (day.day() === 0) {
       textStyle.push(styles.cellTextRed);
-    } else if (colIndex === 6) {
+    } else if (day.day() === 6) {
       textStyle.push(styles.cellTextBlue);
     }
     return textStyle;
@@ -52,7 +51,7 @@ const CalendarWeekView = () => {
   const renderItem = useCallback(
     (args: { item: DayItem }) => {
       const { item } = args;
-      const { day, isInCurrentMonth, colIndex } = item;
+      const { day, isInCurrentMonth } = item;
       const isSelected = dayjs(day).isSame(selectedDay, 'day');
       return (
         <TouchableOpacity
@@ -62,7 +61,7 @@ const CalendarWeekView = () => {
         >
           <Text
             style={[
-              getDayTextStyle(day, isInCurrentMonth, colIndex),
+              getDayTextStyle({day}),
               isSelected && styles.selectedDay,
             ]}
           >
