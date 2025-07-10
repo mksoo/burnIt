@@ -8,7 +8,8 @@ export type DayItem = {
 
 export const useCalendar = () => {
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
+  const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
+  const [currentWeek, setCurrentWeek] = useState<Dayjs>(dayjs().startOf('week'));
 
   const [viewType, setViewType] = useState<"MONTH" | "WEEK">("MONTH");
 
@@ -16,7 +17,7 @@ export const useCalendar = () => {
     if (viewType === "MONTH") {
       setCurrentMonth(prev => prev.add(1, 'month'));
     } else {
-      setCurrentMonth(prev => prev.add(1, 'week'));
+      setCurrentWeek(prev => prev.add(1, 'week'));
     }
   }, [viewType]);
 
@@ -24,9 +25,21 @@ export const useCalendar = () => {
     if (viewType === "MONTH") {
       setCurrentMonth(prev => prev.subtract(1, 'month'));
     } else {
-      setCurrentMonth(prev => prev.subtract(1, 'week'));
+      setCurrentWeek(prev => prev.subtract(1, 'week'));
     }
   }, [viewType]);
+
+  const weekDays = useMemo(() => {
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const startOfWeek = currentWeek.startOf('week');
+      const day = startOfWeek.add(i, 'day');
+      return {
+        day,
+        colIndex: day.day(),
+      };
+    });
+    return days;
+  }, [selectedDay, currentWeek]);
 
   const monthDays = useMemo(() => {
     const daysArray: DayItem[] = [];
@@ -61,10 +74,12 @@ export const useCalendar = () => {
   );
 
   return {
+    weekDays,
     monthDays,
     handleDayPress,
     selectedDay,
     setSelectedDay,
+    currentWeek,
     currentMonth,
     setCurrentMonth,
     viewType,

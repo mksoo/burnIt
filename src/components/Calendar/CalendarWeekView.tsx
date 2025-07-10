@@ -1,30 +1,18 @@
 // src/components/Calendar/CalendarWeekView.tsx
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, FlatList } from 'react-native';
 import dayjs, { Dayjs } from 'dayjs';
 import { DayItem, useCalendar } from '@/hooks/useCalendar';
 import { styles } from './styles';
 
-const CalendarWeekView = () => {
-  const { selectedDay, setSelectedDay } = useCalendar();
+interface Props {
+  weekDays: DayItem[];
+  selectedDay: Dayjs;
+  setSelectedDay: (day: Dayjs) => void;
+}
 
-  const [startOfWeek, setStartOfWeek] = useState<Dayjs>(
-    selectedDay.startOf('week'),
-  );
-
-  const weekDays = useMemo(() => {
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const day = startOfWeek.add(i, 'day');
-      return {
-        day,
-        colIndex: day.day(),
-      };
-    });
-    return days;
-  }, [selectedDay, startOfWeek]);
-
-
+const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, setSelectedDay}) => {
   const getDayTextStyle = (args: {
     day: Dayjs
   }) => {

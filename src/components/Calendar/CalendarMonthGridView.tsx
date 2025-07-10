@@ -2,9 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { DayItem, useCalendar } from '@/hooks/useCalendar';
 import { styles } from './styles';
-import dayjs, { Dayjs } from 'dayjs';
-import { WeekDayHeader } from './WeekDayHeader';
-import { CalendarHeader } from './CalendarHeader';
+import { Dayjs } from 'dayjs';
 
 interface Props {
   selectedDay: Dayjs;
@@ -52,8 +50,6 @@ const CalendarMonthGridView: FC<Props> = ({selectedDay, monthDays, handleDayPres
       </TouchableOpacity>
     );
   };
-
-  console.log('selectedDay', selectedDay);
 
   return (
       <FlatList

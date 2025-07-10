@@ -6,15 +6,27 @@ import { WeekDayHeader } from './WeekDayHeader';
 import CalendarMonthGridView from './CalendarMonthGridView';
 import { styles } from './styles';
 import CalendarWeekView from './CalendarWeekView';
+import Animated from 'react-native-reanimated';
+import Divider from '../common/Divider';
 
 const Calendar: React.FC = () => {
-  const {selectedDay, currentMonth, monthDays, handleDayPress, handleClickPrevious, handleClickNext, viewType} = useCalendar();
-
+  const {
+    weekDays,
+    selectedDay,
+    setSelectedDay,
+    currentWeek,
+    currentMonth,
+    monthDays,
+    handleDayPress,
+    handleClickPrevious,
+    handleClickNext,
+    viewType,
+  } = useCalendar();
 
   return (
     <View style={styles.container}>
       <CalendarHeader
-        currentDay={currentMonth}
+        currentDay={viewType==="MONTH" ? currentMonth : currentWeek}
         onPressPrev={handleClickPrevious}
         onPressNext={handleClickNext}
       />
@@ -26,9 +38,13 @@ const Calendar: React.FC = () => {
             monthDays={monthDays} 
             handleDayPress={handleDayPress}/>
           :
-          <CalendarWeekView />
+          <CalendarWeekView
+            weekDays={weekDays}
+            selectedDay={selectedDay}
+            setSelectedDay={setSelectedDay}/>
         }
       </View>
+      <Divider style={{marginTop: 10}}/>
     </View>
   );
 };
