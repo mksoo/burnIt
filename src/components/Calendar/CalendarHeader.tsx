@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './styles';
 import dayjs from 'dayjs';
@@ -25,7 +25,7 @@ interface CalendarHeaderProps {
   onPressNext: () => void;
 }
 
-export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
+export const CalendarHeader: FC<CalendarHeaderProps> = ({
   currentDay,
   onPressPrev,
   onPressNext,
