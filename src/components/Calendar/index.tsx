@@ -7,7 +7,7 @@ import CalendarMonthGridView from './CalendarMonthGridView';
 import { styles } from './styles';
 import Divider from '../common/Divider';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import CalendarWeekView from './CalendarWeekView';
 
 const Calendar: FC = () => {
@@ -22,6 +22,7 @@ const Calendar: FC = () => {
     handleClickPrevious,
     handleClickNext,
     viewType,
+    setViewType
   } = useCalendar();
 
   const MIN_HEIGHT = 50;
@@ -42,8 +43,10 @@ const Calendar: FC = () => {
     .onEnd((e) => {
       if (viewHeight.value > (MIN_HEIGHT + MAX_HEIGHT) / 2) {
         viewHeight.value = withTiming(MAX_HEIGHT, { duration: 200 });
+        runOnJS(setViewType)('MONTH');
       } else {
         viewHeight.value = withTiming(MIN_HEIGHT, { duration: 200 });
+        runOnJS(setViewType)('WEEK');
       }
     });
 
