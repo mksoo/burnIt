@@ -1,7 +1,7 @@
 // src/components/Calendar/CalendarWeekView.tsx
 
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { Text, TouchableOpacity, FlatList } from 'react-native';
+import { Text, TouchableOpacity, FlatList, StyleProp, ViewStyle } from 'react-native';
 import dayjs, { Dayjs } from 'dayjs';
 import { DayItem, useCalendar } from '@/hooks/useCalendar';
 import { styles } from './styles';
@@ -10,9 +10,10 @@ interface Props {
   weekDays: DayItem[];
   selectedDay: Dayjs;
   setSelectedDay: (day: Dayjs) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, setSelectedDay}) => {
+const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, setSelectedDay, style}) => {
   const getDayTextStyle = (args: {
     day: Dayjs
   }) => {
@@ -53,6 +54,11 @@ const CalendarWeekView: FC<Props>= ({weekDays, selectedDay, setSelectedDay}) => 
 
   return (
     <FlatList
+      contentContainerStyle={{
+        flex: 1,
+        justifyContent: 'center',
+      }}
+      style={style}
       data={weekDays}
       renderItem={renderItem}
       keyExtractor={(_, index) => `day-${index}`}

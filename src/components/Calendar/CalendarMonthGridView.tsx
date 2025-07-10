@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleProp, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { DayItem, useCalendar } from '@/hooks/useCalendar';
 import { styles } from './styles';
 import { Dayjs } from 'dayjs';
@@ -8,9 +8,10 @@ interface Props {
   selectedDay: Dayjs;
   monthDays: DayItem[];
   handleDayPress: (args: {dayItem: DayItem}) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-const CalendarMonthGridView: FC<Props> = ({selectedDay, monthDays, handleDayPress}) => {
+const CalendarMonthGridView: FC<Props> = ({selectedDay, monthDays, handleDayPress, style}) => {
 
   const getTextStyle = (args: { item: DayItem }) => {
     const { item } = args;
@@ -53,6 +54,7 @@ const CalendarMonthGridView: FC<Props> = ({selectedDay, monthDays, handleDayPres
 
   return (
       <FlatList
+        style={[style]}
         data={monthDays}
         renderItem={renderCalendarCell}
         keyExtractor={(_, index) => `day-${index}`}
